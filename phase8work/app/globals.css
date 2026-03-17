@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-fraternity-cream text-fraternity-charcoal antialiased;
+}
+
+::selection {
+  @apply bg-fraternity-burgundy text-white;
+}
+
+@layer base {
+  h1, h2, h3, h4 {
+    @apply font-serif tracking-tight text-fraternity-charcoal;
+  }
+
+  p {
+    @apply leading-7 text-fraternity-slate;
+  }
+}
+
+@layer components {
+  .surface {
+    @apply rounded-3xl border border-black/5 bg-white/80 shadow-soft backdrop-blur-sm;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+}
