@@ -6,7 +6,7 @@ export default async function LegacyVaultSubmitPage() {
   const session = await requireSession();
 
   if (!session) {
-    redirect("/member/login");
+    redirect("/active/login");
   }
 
   return (

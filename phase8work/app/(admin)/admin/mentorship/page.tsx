@@ -3,9 +3,23 @@ import { AdminMentorshipMatchButton } from "@/components/admin/admin-mentorship-
 
 export const dynamic = "force-dynamic";
 
+function formatLabel(value?: string | null) {
+  if (!value) return "—";
+  return value
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 export default async function AdminMentorshipPage() {
-  const { mentors, mentees, matches, suggestionsByMentee } =
-    await getAdminMentorshipDashboard();
+  const {
+    mentors,
+    mentees,
+    matches,
+    opportunities,
+    applications,
+    suggestionsByMentee,
+  } = await getAdminMentorshipDashboard();
 
   return (
     <div className="space-y-8 py-2">
@@ -13,9 +27,10 @@ export default async function AdminMentorshipPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-fraternity-burgundy/80">
           Admin module
         </p>
-        <h1 className="mt-3 text-4xl">Mentorship matching</h1>
+        <h1 className="mt-3 text-4xl">Mentorship management</h1>
         <p className="mt-4 max-w-3xl text-fraternity-slate">
-          Review mentors, mentee requests, and suggested pairings. Admins can confirm matches manually while using algorithmic suggestions for speed.
+          Review the structured mentorship pipeline, alumni-posted opportunities,
+          and verified member applications from one place.
         </p>
       </div>
 
@@ -25,7 +40,10 @@ export default async function AdminMentorshipPage() {
           <div className="mt-6 space-y-4">
             {mentors.length ? (
               mentors.map((mentor: any) => (
-                <div key={mentor.id} className="rounded-2xl border border-black/10 bg-white/70 p-4">
+                <div
+                  key={mentor.id}
+                  className="rounded-2xl border border-black/10 bg-white/70 p-4"
+                >
                   <p className="font-semibold">{mentor.full_name}</p>
                   <p className="mt-1 text-sm text-fraternity-slate">
                     {mentor.job_title || "Mentor"} · {mentor.company || "—"}
@@ -34,7 +52,8 @@ export default async function AdminMentorshipPage() {
                     {mentor.industry || "—"} · {mentor.location || "—"}
                   </p>
                   <p className="mt-1 text-sm text-fraternity-slate">
-                    Major: {mentor.major || "—"} · Experience: {mentor.years_experience ?? "—"} yrs
+                    Major: {mentor.major || "—"} · Experience:{" "}
+                    {mentor.years_experience ?? "—"} yrs
                   </p>
                 </div>
               ))
@@ -51,24 +70,33 @@ export default async function AdminMentorshipPage() {
               mentees.map((mentee: any) => {
                 const suggestions = suggestionsByMentee[mentee.id] || [];
                 return (
-                  <div key={mentee.id} className="rounded-2xl border border-black/10 bg-white/70 p-5">
+                  <div
+                    key={mentee.id}
+                    className="rounded-2xl border border-black/10 bg-white/70 p-5"
+                  >
                     <p className="font-semibold">{mentee.full_name}</p>
                     <p className="mt-1 text-sm text-fraternity-slate">
-                      Major: {mentee.major || "—"} · Desired industry: {mentee.desired_industry || mentee.industry || "—"}
+                      Major: {mentee.major || "—"} · Desired industry:{" "}
+                      {mentee.desired_industry || mentee.industry || "—"}
                     </p>
                     <p className="mt-1 text-sm text-fraternity-slate">
-                      Location preference: {mentee.location_preference || mentee.location || "—"}
+                      Location preference:{" "}
+                      {mentee.location_preference || mentee.location || "—"}
                     </p>
                     <p className="mt-2 text-sm text-fraternity-slate">
                       Goals: {mentee.goals || "No goals provided."}
                     </p>
 
                     <div className="mt-4 space-y-3">
-                      <p className="text-sm font-semibold text-fraternity-charcoal">Suggested mentors</p>
+                      <p className="text-sm font-semibold text-fraternity-charcoal">
+                        Suggested mentors
+                      </p>
 
                       {suggestions.length ? (
                         suggestions.map((suggestion: any) => {
-                          const mentor = mentors.find((m: any) => m.id === suggestion.mentorId);
+                          const mentor = mentors.find(
+                            (m: any) => m.id === suggestion.mentorId
+                          );
                           if (!mentor) return null;
 
                           return (
@@ -80,13 +108,15 @@ export default async function AdminMentorshipPage() {
                                 <div>
                                   <p className="font-semibold">{mentor.full_name}</p>
                                   <p className="mt-1 text-sm text-fraternity-slate">
-                                    {mentor.job_title || "Mentor"} · {mentor.company || "—"}
+                                    {mentor.job_title || "Mentor"} ·{" "}
+                                    {mentor.company || "—"}
                                   </p>
                                   <p className="mt-1 text-sm text-fraternity-slate">
                                     Score: {suggestion.score}
                                   </p>
                                   <p className="mt-1 text-sm text-fraternity-slate">
-                                    Reasons: {suggestion.reasons.join(", ") || "No reasons"}
+                                    Reasons:{" "}
+                                    {suggestion.reasons.join(", ") || "No reasons"}
                                   </p>
                                 </div>
 
@@ -108,9 +138,79 @@ export default async function AdminMentorshipPage() {
                 );
               })
             ) : (
-              <p className="text-sm text-fraternity-slate">No mentee requests yet.</p>
+              <p className="text-sm text-fraternity-slate">
+                No mentee requests yet.
+              </p>
             )}
           </div>
+        </div>
+      </div>
+
+      <div className="surface p-8">
+        <h2 className="text-2xl">Alumni-posted opportunities</h2>
+        <div className="mt-6 space-y-4">
+          {opportunities.length ? (
+            opportunities.map((opportunity: any) => (
+              <div
+                key={opportunity.id}
+                className="rounded-2xl border border-black/10 bg-white/70 p-4"
+              >
+                <p className="font-semibold">{opportunity.title}</p>
+                <p className="mt-1 text-sm text-fraternity-slate">
+                  {formatLabel(opportunity.opportunity_type)} ·{" "}
+                  {opportunity.company || "—"} · {opportunity.location || "—"}
+                </p>
+                <p className="mt-1 text-sm text-fraternity-slate">
+                  Status: {formatLabel(opportunity.review_status)} · Active:{" "}
+                  {opportunity.is_active ? "Yes" : "No"} · Public:{" "}
+                  {opportunity.is_public ? "Yes" : "No"}
+                </p>
+                <p className="mt-2 text-sm text-fraternity-slate">
+                  {opportunity.description}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-fraternity-slate">
+              No mentorship opportunities yet.
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="surface p-8">
+        <h2 className="text-2xl">Opportunity applications</h2>
+        <div className="mt-6 space-y-4">
+          {applications.length ? (
+            applications.map((application: any) => (
+              <div
+                key={application.id}
+                className="rounded-2xl border border-black/10 bg-white/70 p-4"
+              >
+                <p className="font-semibold">{application.applicant_email}</p>
+                <p className="mt-1 text-sm text-fraternity-slate">
+                  Status: {formatLabel(application.status)} · Verification:{" "}
+                  {formatLabel(application.verification_status)}
+                </p>
+                <p className="mt-1 text-sm text-fraternity-slate">
+                  Major: {application.major || "—"} · Graduation year:{" "}
+                  {application.graduation_year || "—"}
+                </p>
+                <p className="mt-2 text-sm text-fraternity-slate">
+                  Why interested: {application.why_interested || "—"}
+                </p>
+                <p className="mt-2 text-sm text-fraternity-slate">
+                  Resume: {application.resume_path ? "Uploaded" : "Not uploaded"} ·
+                  Cover letter:{" "}
+                  {application.cover_letter_path ? "Uploaded" : "Not uploaded"}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-fraternity-slate">
+              No opportunity applications yet.
+            </p>
+          )}
         </div>
       </div>
 
@@ -119,8 +219,13 @@ export default async function AdminMentorshipPage() {
         <div className="mt-6 space-y-4">
           {matches.length ? (
             matches.map((match: any) => (
-              <div key={match.id} className="rounded-2xl border border-black/10 bg-white/70 p-4">
-                <p className="font-semibold">Match score: {match.match_score ?? "—"}</p>
+              <div
+                key={match.id}
+                className="rounded-2xl border border-black/10 bg-white/70 p-4"
+              >
+                <p className="font-semibold">
+                  Match score: {match.match_score ?? "—"}
+                </p>
                 <p className="mt-1 text-sm text-fraternity-slate">
                   Status: {match.match_status}
                 </p>

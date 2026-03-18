@@ -1,123 +1,114 @@
-export type MentorRecord = {
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  getTopMentorSuggestions,
+  type MentorRecord,
+  type MenteeRequestRecord,
+} from "@/lib/mentorship/matching";
+
+type MatchRow = {
   id: string;
-  full_name: string;
-  industry?: string | null;
-  company?: string | null;
-  job_title?: string | null;
-  location?: string | null;
-  major?: string | null;
-  years_experience?: number | null;
-  preferred_mentoring_areas?: string[] | null;
-  availability?: string | null;
-  preferred_contact_method?: string | null;
-  status?: string | null;
+  mentor_id: string;
+  mentee_request_id: string;
+  match_status: string | null;
+  match_score: number | null;
+  match_reason: string[] | null;
+  admin_notes: string | null;
+  created_by: string | null;
+  created_at: string | null;
 };
 
-export type MenteeRequestRecord = {
+type OpportunityRow = {
   id: string;
-  full_name: string;
-  industry?: string | null;
-  desired_industry?: string | null;
-  location?: string | null;
-  location_preference?: string | null;
-  major?: string | null;
-  goals?: string | null;
-  preferred_contact_method?: string | null;
-  status?: string | null;
+  alumni_profile_id: string;
+  title: string;
+  slug: string | null;
+  opportunity_type: string;
+  company: string | null;
+  location: string | null;
+  location_type: string | null;
+  industry: string | null;
+  description: string;
+  preferred_major: string | null;
+  preferred_years: string | null;
+  is_active: boolean | null;
+  is_public: boolean | null;
+  review_status: string | null;
+  expires_at: string | null;
+  created_at: string | null;
 };
 
-export type MatchSuggestion = {
-  mentorId: string;
-  score: number;
-  reasons: string[];
+type OpportunityApplicationRow = {
+  id: string;
+  opportunity_id: string;
+  alumni_profile_id: string;
+  applicant_email: string;
+  applicant_phone: string | null;
+  major: string | null;
+  graduation_year: number | null;
+  linkedin_url: string | null;
+  message: string | null;
+  why_interested: string | null;
+  experience_summary: string | null;
+  preferred_contact_method: string | null;
+  status: string | null;
+  verification_status: string | null;
+  resume_path: string | null;
+  cover_letter_path: string | null;
+  admin_notes: string | null;
+  alumni_notes: string | null;
+  created_at: string | null;
 };
 
-function norm(value?: string | null) {
-  return (value || "").trim().toLowerCase();
-}
+export async function getAdminMentorshipDashboard() {
+  const supabase = createServerSupabaseClient();
 
-function includesLoose(haystack?: string | null, needle?: string | null) {
-  const h = norm(haystack);
-  const n = norm(needle);
-  if (!h || !n) return false;
-  return h.includes(n) || n.includes(h);
-}
-
-function overlaps(a?: string[] | null, bText?: string | null) {
-  const b = norm(bText);
-  if (!a?.length || !b) return false;
-  return a.some((item) => includesLoose(item, b));
-}
-
-export function scoreMentorForMentee(
-  mentor: MentorRecord,
-  mentee: MenteeRequestRecord
-): MatchSuggestion {
-  let score = 0;
-  const reasons: string[] = [];
-
-  if (mentor.status && mentor.status !== "approved") {
-    return { mentorId: mentor.id, score: -1, reasons: ["mentor not approved"] };
+  if (!supabase) {
+    return {
+      mentors: [],
+      mentees: [],
+      matches: [],
+      opportunities: [],
+      applications: [],
+      suggestionsByMentee: {} as Record<string, ReturnType<typeof getTopMentorSuggestions>>,
+    };
   }
 
-  if (
-    includesLoose(mentor.industry, mentee.desired_industry) ||
-    includesLoose(mentor.industry, mentee.industry)
-  ) {
-    score += 40;
-    reasons.push("industry match");
-  }
+  const [
+    mentorsRes,
+    menteesRes,
+    matchesRes,
+    opportunitiesRes,
+    applicationsRes,
+  ] = await Promise.all([
+    supabase.from("mentors").select("*").order("created_at", { ascending: false }),
+    supabase.from("mentee_requests").select("*").order("created_at", { ascending: false }),
+    supabase.from("mentorship_matches").select("*").order("created_at", { ascending: false }),
+    supabase.from("mentorship_opportunities").select("*").order("created_at", { ascending: false }),
+    supabase.from("mentorship_opportunity_applications").select("*").order("created_at", { ascending: false }),
+  ]);
 
-  if (includesLoose(mentor.major, mentee.major)) {
-    score += 25;
-    reasons.push("major match");
-  }
+  const mentors = ((mentorsRes.data || []) as MentorRecord[]).filter(
+    (mentor) => (mentor.status || "approved") === "approved"
+  );
 
-  if (
-    includesLoose(mentor.location, mentee.location_preference) ||
-    includesLoose(mentor.location, mentee.location)
-  ) {
-    score += 15;
-    reasons.push("location match");
-  }
+  const mentees = (menteesRes.data || []) as MenteeRequestRecord[];
+  const matches = (matchesRes.data || []) as MatchRow[];
+  const opportunities = (opportunitiesRes.data || []) as OpportunityRow[];
+  const applications = (applicationsRes.data || []) as OpportunityApplicationRow[];
 
-  if (overlaps(mentor.preferred_mentoring_areas, mentee.goals)) {
-    score += 30;
-    reasons.push("mentoring goals overlap");
-  }
+  const suggestionsByMentee: Record<string, ReturnType<typeof getTopMentorSuggestions>> = {};
 
-  if (
-    includesLoose(mentor.preferred_contact_method, mentee.preferred_contact_method)
-  ) {
-    score += 5;
-    reasons.push("contact preference match");
-  }
-
-  if ((mentor.years_experience || 0) >= 3) {
-    score += 10;
-    reasons.push("experienced mentor");
-  }
-
-  if (norm(mentor.availability)) {
-    score += 5;
-    reasons.push("availability provided");
+  for (const mentee of mentees) {
+    if ((mentee.status || "open") !== "open") continue;
+    suggestionsByMentee[mentee.id] = getTopMentorSuggestions(mentors, mentee, 3);
   }
 
   return {
-    mentorId: mentor.id,
-    score,
-    reasons,
+    mentors,
+    mentees,
+    matches,
+    opportunities,
+    applications,
+    suggestionsByMentee,
   };
-}
-
-export function getTopMentorSuggestions(
-  mentors: MentorRecord[],
-  mentee: MenteeRequestRecord,
-  limit = 3
-) {
-  return mentors
-    .map((mentor) => scoreMentorForMentee(mentor, mentee))
-    .filter((item) => item.score >= 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
 }

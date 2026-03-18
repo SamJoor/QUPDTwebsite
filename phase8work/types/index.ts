@@ -71,7 +71,7 @@ export type LegacyVaultItem = {
   id: string;
   title: string;
   era: string;
-  type: 'Photo' | 'Document' | 'Story' | 'Composite';
+  type: "Photo" | "Document" | "Story" | "Composite";
   description: string;
 };
 
@@ -95,11 +95,10 @@ export type DirectoryFilters = {
   mentorOnly: boolean;
 };
 
+export type GraduationTerm = "spring" | "summer" | "fall" | "winter";
+export type MemberStatus = "active" | "graduating" | "alumni" | "inactive";
 
-export type GraduationTerm = 'spring' | 'summer' | 'fall' | 'winter';
-export type MemberStatus = 'active' | 'graduating' | 'alumni' | 'inactive';
-
-export type SessionRole = 'admin' | 'alumni';
+export type SessionRole = "admin" | "alumni" | "active";
 
 export type SessionUser = {
   role: SessionRole;
@@ -107,7 +106,6 @@ export type SessionUser = {
   name: string;
   expiresAt: number;
 };
-
 
 export type MemberProfileRecord = {
   id: string;
@@ -127,11 +125,10 @@ export type MemberProfileRecord = {
   phone?: string;
   willingToMentor: boolean;
   isPublic: boolean;
-  emailVisibility: 'private' | 'members' | 'public';
-  phoneVisibility: 'private' | 'members' | 'public';
-  linkedinVisibility: 'private' | 'members' | 'public';
+  emailVisibility: "private" | "members" | "public";
+  phoneVisibility: "private" | "members" | "public";
+  linkedinVisibility: "private" | "members" | "public";
 };
-
 
 export type HomePageContent = {
   heroEyebrow: string;

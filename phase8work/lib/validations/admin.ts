@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const adminLoginSchema = z.object({
   email: z.email(),
   password: z.string().min(4),
-  scope: z.enum(['admin', 'alumni'])
+  scope: z.enum(['admin', 'alumni', "active"]),
 });
 
 export const adminAlumniSchema = z.object({
