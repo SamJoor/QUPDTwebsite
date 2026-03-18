@@ -34,34 +34,49 @@ export async function persistAdminAlumni(input: AdminAlumniInput): Promise<Admin
     return { persisted: true, mode: 'demo' };
   }
 
-  const { data, error } = await supabase.from('alumni_profiles').insert({
-    full_name: input.fullName,
-    graduation_year: input.graduationYear,
-    graduation_term: input.graduationTerm,
-    member_status: input.memberStatus,
-    alumni_access_enabled: input.alumniAccessEnabled,
-    major: input.major,
-    company: input.company,
-    job_title: input.jobTitle,
-    industry: input.industry,
-    location: input.location,
-    short_bio: input.shortBio,
-    linkedin_url: input.linkedinUrl || null,
-    willing_to_mentor: input.willingToMentor,
-    is_public: input.isPublic,
-    is_featured: input.isFeatured
-  }).select('id').maybeSingle();
+  const { data, error } = await supabase
+    .from('alumni_profiles')
+    .insert({
+      full_name: input.fullName,
+      graduation_year: input.graduationYear,
+      graduation_term: input.graduationTerm,
+      member_status: input.memberStatus,
+      alumni_access_enabled: input.alumniAccessEnabled,
+      major: input.major,
+      company: input.company,
+      job_title: input.jobTitle,
+      industry: input.industry,
+      location: input.location,
+      short_bio: input.shortBio,
+      linkedin_url: input.linkedinUrl || null,
+      willing_to_mentor: input.willingToMentor,
+      is_public: input.isPublic,
+      is_featured: input.isFeatured
+    })
+    .select('id')
+    .maybeSingle();
 
-  if (error || !data?.id) return { persisted: false, mode: 'supabase', error: error?.message || 'Unable to create alumni profile.' };
+  if (error || !data?.id) {
+    return {
+      persisted: false,
+      mode: 'supabase',
+      error: error?.message || 'Unable to create alumni profile.'
+    };
+  }
 
-  if (input.email || input.phone) {
-    const { error: detailsError } = await supabase.from('alumni_private_details').insert({
-      alumni_profile_id: data.id,
-      email: input.email || null,
-      phone: input.phone || null
-    });
+  if (input.email || input.phone || input.bondNumber) {
+    const { error: detailsError } = await supabase
+      .from('alumni_private_details')
+      .insert({
+        alumni_profile_id: data.id,
+        email: input.email || null,
+        phone: input.phone || null,
+        bond_number: input.bondNumber || null
+      });
 
-    if (detailsError) return { persisted: false, mode: 'supabase', error: detailsError.message };
+    if (detailsError) {
+      return { persisted: false, mode: 'supabase', error: detailsError.message };
+    }
   }
 
   return { persisted: true, mode: 'supabase' };
@@ -71,26 +86,31 @@ export async function updateAdminAlumni(id: string, input: AdminAlumniInput): Pr
   const supabase = createServerSupabaseClient();
   if (!supabase) {
     const updated = await updateDemoAlumni(id, input);
-    return updated ? { persisted: true, mode: 'demo' } : { persisted: false, mode: 'demo', error: 'Record not found.' };
+    return updated
+      ? { persisted: true, mode: 'demo' }
+      : { persisted: false, mode: 'demo', error: 'Record not found.' };
   }
 
-  const { error } = await supabase.from('alumni_profiles').update({
-    full_name: input.fullName,
-    graduation_year: input.graduationYear,
-    graduation_term: input.graduationTerm,
-    member_status: input.memberStatus,
-    alumni_access_enabled: input.alumniAccessEnabled,
-    major: input.major,
-    company: input.company,
-    job_title: input.jobTitle,
-    industry: input.industry,
-    location: input.location,
-    short_bio: input.shortBio,
-    linkedin_url: input.linkedinUrl || null,
-    willing_to_mentor: input.willingToMentor,
-    is_public: input.isPublic,
-    is_featured: input.isFeatured,
-  }).eq('id', id);
+  const { error } = await supabase
+    .from('alumni_profiles')
+    .update({
+      full_name: input.fullName,
+      graduation_year: input.graduationYear,
+      graduation_term: input.graduationTerm,
+      member_status: input.memberStatus,
+      alumni_access_enabled: input.alumniAccessEnabled,
+      major: input.major,
+      company: input.company,
+      job_title: input.jobTitle,
+      industry: input.industry,
+      location: input.location,
+      short_bio: input.shortBio,
+      linkedin_url: input.linkedinUrl || null,
+      willing_to_mentor: input.willingToMentor,
+      is_public: input.isPublic,
+      is_featured: input.isFeatured,
+    })
+    .eq('id', id);
 
   if (error) return { persisted: false, mode: 'supabase', error: error.message };
 
@@ -98,13 +118,18 @@ export async function updateAdminAlumni(id: string, input: AdminAlumniInput): Pr
     alumni_profile_id: id,
     email: input.email || null,
     phone: input.phone || null,
+    bond_number: input.bondNumber || null,
   };
 
-  const { error: detailsError } = await supabase.from('alumni_private_details').upsert(privatePayload, {
-    onConflict: 'alumni_profile_id'
-  });
+  const { error: detailsError } = await supabase
+    .from('alumni_private_details')
+    .upsert(privatePayload, {
+      onConflict: 'alumni_profile_id'
+    });
 
-  return detailsError ? { persisted: false, mode: 'supabase', error: detailsError.message } : { persisted: true, mode: 'supabase' };
+  return detailsError
+    ? { persisted: false, mode: 'supabase', error: detailsError.message }
+    : { persisted: true, mode: 'supabase' };
 }
 
 export async function persistAdminEvent(input: AdminEventInput): Promise<AdminPersistResult> {
@@ -246,7 +271,12 @@ export async function updateHomePageContent(input: AdminHomePageInput): Promise<
     return { persisted: true, mode: 'demo' };
   }
 
-  const rows = Object.entries(input).map(([content_key, content_value]) => ({ page_slug: 'home', content_key, content_value }));
+  const rows = Object.entries(input).map(([content_key, content_value]) => ({
+    page_slug: 'home',
+    content_key,
+    content_value
+  }));
+
   const { error } = await supabase.from('site_content').upsert(rows, { onConflict: 'page_slug,content_key' });
   return error ? { persisted: false, mode: 'supabase', error: error.message } : { persisted: true, mode: 'supabase' };
 }
@@ -258,7 +288,12 @@ export async function updateAboutPageContent(input: AdminAboutPageInput): Promis
     return { persisted: true, mode: 'demo' };
   }
 
-  const rows = Object.entries(input).map(([content_key, content_value]) => ({ page_slug: 'about', content_key, content_value }));
+  const rows = Object.entries(input).map(([content_key, content_value]) => ({
+    page_slug: 'about',
+    content_key,
+    content_value
+  }));
+
   const { error } = await supabase.from('site_content').upsert(rows, { onConflict: 'page_slug,content_key' });
   return error ? { persisted: false, mode: 'supabase', error: error.message } : { persisted: true, mode: 'supabase' };
 }
@@ -275,7 +310,12 @@ export async function importAdminAlumni(records: AdminAlumniInput[]): Promise<Ad
     let profileId: string | null = null;
 
     if (normalizedEmail) {
-      const privateLookup = await supabase.from('alumni_private_details').select('alumni_profile_id').eq('email', normalizedEmail).maybeSingle();
+      const privateLookup = await supabase
+        .from('alumni_private_details')
+        .select('alumni_profile_id')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
       profileId = (privateLookup.data?.alumni_profile_id as string | undefined) ?? null;
     }
 
@@ -286,6 +326,7 @@ export async function importAdminAlumni(records: AdminAlumniInput[]): Promise<Ad
         .eq('full_name', input.fullName)
         .eq('graduation_year', input.graduationYear)
         .maybeSingle();
+
       profileId = (profileLookup.data?.id as string | undefined) ?? null;
     }
 

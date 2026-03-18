@@ -22,9 +22,9 @@ export default async function HomePage() {
         description={content.heroDescription}
         actions={
           <>
-            <Button href="/contact">Join the Alumni Network</Button>
+            <Button href="/member/login">Alumni Login</Button>
             <Button href="/events" variant="secondary">View Events</Button>
-            <Button href="/mentorship" variant="ghost">Become a Mentor</Button>
+            <Button href="/admin/login" variant="ghost">Admin Login</Button>
           </>
         }
       />
@@ -89,7 +89,9 @@ export default async function HomePage() {
         <Container>
           <div className="surface grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:p-12">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-fraternity-burgundy">{content.legacyEyebrow}</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-fraternity-burgundy">
+                {content.legacyEyebrow}
+              </p>
               <h2 className="mt-3 text-3xl md:text-4xl">{content.legacyTitle}</h2>
               <p className="mt-4 max-w-2xl text-lg">{content.legacyDescription}</p>
             </div>
@@ -106,8 +108,8 @@ export default async function HomePage() {
         description={content.finalCtaDescription}
         actions={
           <>
-            <Button href="/contact" variant="secondary">Stay connected</Button>
-            <Button href="/mentorship">Become a mentor</Button>
+            <Button href="/member/login" variant="secondary">Alumni Login</Button>
+            <Button href="/admin/login">Admin Login</Button>
           </>
         }
       />

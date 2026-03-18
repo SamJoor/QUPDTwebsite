@@ -21,6 +21,7 @@ export const adminAlumniSchema = z.object({
   linkedinUrl: z.string().url().or(z.literal('')).optional(),
   email: z.email().or(z.literal('')).optional(),
   phone: z.string().optional(),
+  bondNumber: z.string().optional().default(''),
   willingToMentor: z.boolean().default(false),
   isPublic: z.boolean().default(true),
   isFeatured: z.boolean().default(false)
