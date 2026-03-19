@@ -25,12 +25,10 @@ export function NewsletterSignupForm() {
         <Field label="Email address">
           <Input type="email" name="email" required placeholder="you@example.com" />
         </Field>
-        <Field label="Graduation year">
-          <Input name="graduationYear" placeholder="2018" />
-        </Field>
         <Field label="Subscriber type">
           <Select name="subscriberType" required defaultValue="">
             <option value="" disabled>Choose one</option>
+            <option value="active">Active Member</option>
             <option value="alumni">Alumni</option>
             <option value="parent">Parent / Family</option>
             <option value="supporter">Supporter</option>

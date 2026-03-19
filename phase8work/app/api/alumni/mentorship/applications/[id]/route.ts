@@ -83,7 +83,18 @@ export async function POST(
 
     const applicationRes = await supabase
       .from("mentorship_opportunity_applications")
-      .select("id, opportunity_id")
+      .select(`
+        id,
+        opportunity_id,
+        applicant_email,
+        resume_path,
+        cover_letter_path,
+        alumni_notes,
+        alumni_profile_id,
+        alumni_profiles (
+          full_name
+        )
+      `)
       .eq("id", applicationId)
       .maybeSingle();
 
@@ -94,10 +105,23 @@ export async function POST(
       );
     }
 
+    const application = applicationRes.data as {
+      id: string;
+      opportunity_id: string;
+      applicant_email: string;
+      resume_path: string | null;
+      cover_letter_path: string | null;
+      alumni_notes: string | null;
+      alumni_profile_id: string;
+      alumni_profiles?: {
+        full_name?: string | null;
+      } | null;
+    };
+
     const opportunityRes = await supabase
       .from("mentorship_opportunities")
-      .select("id, alumni_profile_id")
-      .eq("id", applicationRes.data.opportunity_id)
+      .select("id, alumni_profile_id, title, company")
+      .eq("id", application.opportunity_id)
       .maybeSingle();
 
     if (opportunityRes.error || !opportunityRes.data?.id) {
@@ -107,11 +131,69 @@ export async function POST(
       );
     }
 
-    if (opportunityRes.data.alumni_profile_id !== alumniProfileId) {
+    const opportunity = opportunityRes.data as {
+      id: string;
+      alumni_profile_id: string;
+      title: string;
+      company: string | null;
+    };
+
+    if (opportunity.alumni_profile_id !== alumniProfileId) {
       return NextResponse.json(
         { error: "You do not have permission to review this application." },
         { status: 403 }
       );
+    }
+
+    if (status === "declined") {
+      if (application.resume_path) {
+        const removeResumeRes = await supabase.storage
+          .from("mentorship-applications")
+          .remove([application.resume_path]);
+
+        if (removeResumeRes.error) {
+          console.error(
+            "[decline application] failed to delete resume",
+            removeResumeRes.error
+          );
+        }
+      }
+
+      if (application.cover_letter_path) {
+        const removeCoverRes = await supabase.storage
+          .from("mentorship-applications")
+          .remove([application.cover_letter_path]);
+
+        if (removeCoverRes.error) {
+          console.error(
+            "[decline application] failed to delete cover letter",
+            removeCoverRes.error
+          );
+        }
+      }
+
+      const deleteRes = await supabase
+        .from("mentorship_opportunity_applications")
+        .delete()
+        .eq("id", applicationId);
+
+      if (deleteRes.error) {
+        return NextResponse.json(
+          {
+            error:
+              deleteRes.error.message || "Failed to delete declined application.",
+          },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        deleted: true,
+        applicationId,
+        opportunityId: opportunity.id,
+        redirectTo: `/member/mentorship/${opportunity.id}`,
+      });
     }
 
     const updateRes = await supabase
@@ -132,13 +214,21 @@ export async function POST(
       );
     }
 
-    return NextResponse.redirect(
-      new URL(
-        `/member/mentorship/${applicationRes.data.opportunity_id}`,
-        request.url
-      ),
-      { status: 303 }
-    );
+    if (status === "accepted") {
+      return NextResponse.json({
+        success: true,
+        applicationId,
+        opportunityId: opportunity.id,
+        redirectTo: `/member/mentorship/${opportunity.id}/applications/${applicationId}/email`,
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      applicationId,
+      opportunityId: opportunity.id,
+      redirectTo: `/member/mentorship/${opportunity.id}`,
+    });
   } catch (error) {
     console.error("[POST /api/alumni/mentorship/applications/[id]]", error);
 

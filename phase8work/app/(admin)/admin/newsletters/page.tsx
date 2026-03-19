@@ -46,31 +46,79 @@ export default async function NewslettersAdminPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.05fr_1fr]">
         <ApiForm
-          title="Create newsletter issue"
-          description="Draft or publish newsletter issues now, then wire Resend or Mailchimp later. In demo mode they persist locally."
-          endpoint="/api/admin/newsletters"
-          successMessage="Newsletter issue submitted successfully."
-          submitLabel="Save issue"
-        >
-          <div className="grid gap-5 md:grid-cols-2">
-            <Field label="Title"><Input name="title" required /></Field>
-            <Field label="Slug"><Input name="slug" placeholder="spring-2026-brotherhood-update" required /></Field>
-            <Field label="Category"><Input name="category" placeholder="Chapter Update" required /></Field>
-            <Field label="Issue date"><Input name="issueDate" type="date" required /></Field>
-            <Field label="Subject line"><Input name="subjectLine" required /></Field>
-            <Field label="Status">
-              <Select name="status" defaultValue="draft">
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="sent">Sent</option>
-              </Select>
-            </Field>
-          </div>
-          <Field label="Summary"><Textarea name="summary" rows={4} required /></Field>
-          <Field label="Body content"><Textarea name="bodyContent" rows={7} required /></Field>
-          <Checkbox name="isFeatured" label="Feature this issue on the homepage" />
-        </ApiForm>
+  title="Create newsletter issue"
+  description="Draft or publish newsletter issues now, then wire Resend or Mailchimp later."
+  endpoint="/api/admin/newsletters"
+  successMessage="Newsletter issue submitted successfully."
+  submitLabel="Save issue"
+>
+  <div className="grid gap-5 md:grid-cols-2">
+    <Field label="Title">
+      <Input name="title" required maxLength={120} />
+    </Field>
 
+    <Field label="Slug">
+      <Input
+        name="slug"
+        placeholder="spring-2026-brotherhood-update"
+        required
+        maxLength={160}
+      />
+    </Field>
+
+    <Field label="Category">
+      <Input name="category" placeholder="Chapter Update" required maxLength={60} />
+    </Field>
+
+    <Field label="Issue date">
+      <Input name="issueDate" type="date" required />
+    </Field>
+
+    <Field label="Subject line">
+      <Input name="subjectLine" required maxLength={160} />
+    </Field>
+
+    <Field label="Status">
+      <Select name="status" defaultValue="draft">
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+        <option value="sent">Sent</option>
+      </Select>
+    </Field>
+  </div>
+
+  <Field label="Summary">
+    <>
+      <Textarea
+        name="summary"
+        rows={3}
+        required
+        minLength={10}
+        maxLength={160}
+      />
+      <p className="mt-2 text-xs text-fraternity-slate">
+        10–160 characters. This should be a short preview, not the full issue.
+      </p>
+    </>
+  </Field>
+
+  <Field label="Body content">
+    <>
+      <Textarea
+        name="bodyContent"
+        rows={7}
+        required
+        minLength={20}
+        maxLength={10000}
+      />
+      <p className="mt-2 text-xs text-fraternity-slate">
+        Minimum 20 characters. This is the full newsletter body.
+      </p>
+    </>
+  </Field>
+
+  <Checkbox name="isFeatured" label="Feature this issue on the homepage" />
+</ApiForm>
         <AdminTable title="Newsletter records" rows={rows} deleteEndpoint="/api/admin/newsletters" exportHref="/api/admin/export/newsletters" editBaseHref="/admin/newsletters" />
       </div>
     </div>

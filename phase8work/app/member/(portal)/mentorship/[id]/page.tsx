@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { OpportunityApplicationReviewForm } from "@/components/member/opportunity-application-review-form";
 
 export const dynamic = "force-dynamic";
 
@@ -90,7 +91,9 @@ async function getReviewPageData(opportunityId: string) {
 
   const opportunityRes = await supabase
     .from("mentorship_opportunities")
-    .select("id, alumni_profile_id, title, slug, opportunity_type, company, location, description")
+    .select(
+      "id, alumni_profile_id, title, slug, opportunity_type, company, location, description"
+    )
     .eq("id", opportunityId)
     .maybeSingle();
 
@@ -183,62 +186,6 @@ async function getReviewPageData(opportunityId: string) {
     resumeUrls,
     coverLetterUrls,
   };
-}
-
-function ApplicantActionForm({
-  applicationId,
-  initialNotes,
-}: {
-  applicationId: string;
-  initialNotes?: string | null;
-}) {
-  return (
-    <form
-      action={`/api/alumni/mentorship/applications/${applicationId}`}
-      method="post"
-      className="mt-4 space-y-3"
-    >
-      <label className="block text-sm font-semibold text-fraternity-charcoal">
-        Message to applicant
-      </label>
-      <textarea
-        name="alumniNotes"
-        defaultValue={initialNotes || ""}
-        rows={4}
-        className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none"
-        placeholder="Add next steps for an accepted applicant, or explain why they were declined."
-      />
-
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="submit"
-          name="status"
-          value="accepted"
-          className="inline-flex items-center justify-center rounded-full bg-fraternity-burgundy px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-        >
-          Accept
-        </button>
-
-        <button
-          type="submit"
-          name="status"
-          value="declined"
-          className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-fraternity-charcoal transition hover:bg-fraternity-cream"
-        >
-          Decline
-        </button>
-
-        <button
-          type="submit"
-          name="status"
-          value="under_review"
-          className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-fraternity-charcoal transition hover:bg-fraternity-cream"
-        >
-          Mark under review
-        </button>
-      </div>
-    </form>
-  );
 }
 
 export default async function OpportunityApplicantsPage({ params }: PageProps) {
@@ -391,7 +338,7 @@ export default async function OpportunityApplicantsPage({ params }: PageProps) {
                   )}
                 </div>
 
-                <ApplicantActionForm
+                <OpportunityApplicationReviewForm
                   applicationId={application.id}
                   initialNotes={application.alumni_notes}
                 />

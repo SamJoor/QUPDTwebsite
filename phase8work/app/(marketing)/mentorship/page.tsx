@@ -119,17 +119,6 @@ export default async function MentorshipPage() {
           ))}
         </div>
       </SectionShell>
-
-      <SectionShell
-        eyebrow="Program intake"
-        title="Structured mentorship program"
-        description="Keep the existing mentor signup and mentee request flow for long-term matching while also supporting alumni-posted opportunities."
-      >
-        <div className="grid gap-6 lg:grid-cols-2">
-          <MentorSignupForm />
-          <MenteeRequestForm />
-        </div>
-      </SectionShell>
     </>
   );
 }

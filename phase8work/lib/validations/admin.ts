@@ -42,13 +42,13 @@ export const adminEventSchema = z.object({
 });
 
 export const adminNewsletterSchema = z.object({
-  title: z.string().min(3),
-  slug: z.string().min(3).regex(/^[a-z0-9-]+$/),
-  category: z.string().min(2),
-  issueDate: z.string().min(7),
-  subjectLine: z.string().min(3),
-  summary: z.string().min(20),
-  bodyContent: z.string().min(20),
+  title: z.string().min(3).max(120),
+  slug: z.string().min(3).max(160).regex(/^[a-z0-9-]+$/),
+  category: z.string().min(2).max(60),
+  issueDate: z.string().min(7).max(20),
+  subjectLine: z.string().min(3).max(160),
+  summary: z.string().min(10).max(160),
+  bodyContent: z.string().min(20).max(10000),
   status: z.enum(['draft', 'published', 'sent']).default('draft'),
   isFeatured: z.boolean().default(false)
 });

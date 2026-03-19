@@ -165,6 +165,12 @@ export async function getAdminEventRecords(): Promise<TableRow[]> {
   })) ?? [];
 }
 
+function truncateText(value: string | null | undefined, max = 120) {
+  const text = (value || "").trim();
+  if (text.length <= max) return text;
+  return `${text.slice(0, max).trim()}…`;
+}
+
 export async function getAdminNewsletterRecords(): Promise<TableRow[]> {
   const supabase = createServerSupabaseClient();
 
@@ -174,24 +180,35 @@ export async function getAdminNewsletterRecords(): Promise<TableRow[]> {
       id: row.id,
       primary: row.title,
       secondary: `${row.issueDate} • ${row.category}`,
-      tertiary: row.summary,
-      badge: row.status
+      tertiary: truncateText(row.summary, 120),
+      badge: row.status,
     }));
   }
 
   const { data } = await supabase
-    .from('newsletters')
-    .select('id, title, issue_date, category, summary, status')
-    .order('created_at', { ascending: false })
+    .from("newsletters")
+    .select("id, title, issue_date, category, summary, status")
+    .order("created_at", { ascending: false })
     .limit(50);
 
-  return data?.map((row: { id: string; title: string; issue_date: string | null; category: string | null; summary: string | null; status: string | null }) => ({
-    id: row.id,
-    primary: row.title,
-    secondary: `${row.issue_date ?? 'Draft'} • ${row.category ?? 'Newsletter'}`,
-    tertiary: row.summary ?? '',
-    badge: row.status ?? 'Draft'
-  })) ?? [];
+  return (
+    data?.map(
+      (row: {
+        id: string;
+        title: string;
+        issue_date: string | null;
+        category: string | null;
+        summary: string | null;
+        status: string | null;
+      }) => ({
+        id: row.id,
+        primary: row.title,
+        secondary: `${row.issue_date ?? "Draft"} • ${row.category ?? "Newsletter"}`,
+        tertiary: truncateText(row.summary, 120),
+        badge: row.status ?? "Draft",
+      })
+    ) ?? []
+  );
 }
 
 export async function getAdminMediaRecords(): Promise<MediaItem[]> {

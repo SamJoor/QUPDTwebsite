@@ -1,27 +1,49 @@
-import { PageHero } from '@/components/sections/page-hero';
-import { SectionShell } from '@/components/sections/section-shell';
-import { getAlumniProfiles } from '@/lib/queries/public';
-import { AlumniDirectory } from '@/components/sections/alumni-directory';
-import { CTASection } from '@/components/sections/cta-section';
-import { Button } from '@/components/ui/button';
+import { redirect } from "next/navigation";
+import { getSessionUser } from "@/lib/auth/session";
+import { PageHero } from "@/components/sections/page-hero";
+import { SectionShell } from "@/components/sections/section-shell";
+import { getAlumniProfiles } from "@/lib/queries/public";
+import { AlumniDirectory } from "@/components/sections/alumni-directory";
+import { CTASection } from "@/components/sections/cta-section";
+import { Button } from "@/components/ui/button";
+
+function isAllowedRole(role?: string | null) {
+  return role === "active" || role === "alumni" || role === "admin";
+}
 
 export default async function AlumniPage() {
+  const session = await getSessionUser();
+
+  if (!session || !isAllowedRole(session.role)) {
+    redirect("/active/login");
+  }
+
   const profiles = await getAlumniProfiles();
+
   return (
     <>
       <PageHero
         eyebrow="Alumni Directory"
         title="A professional network rooted in brotherhood"
-        description="This directory now includes working client-side search and filter functionality so it behaves like a real alumni network immediately, even before Supabase is connected."
+        description="This directory is limited to verified chapter members, alumni, and administrators so the network remains useful without exposing internal access publicly."
       />
-      <SectionShell title="Search the network" description="Search by name, company, industry, class year, location, major, or mentor status. Public-facing fields remain intentionally limited.">
+
+      <SectionShell
+        title="Search the network"
+        description="Search by name, company, industry, class year, location, major, or mentor status. Sensitive contact details remain protected."
+      >
         <AlumniDirectory profiles={profiles} />
       </SectionShell>
+
       <CTASection
-        eyebrow="Privacy by Design"
-        title="Keep sensitive contact details protected by default"
-        description="In production, public cards should remain limited while email, phone, and editable profile settings stay behind authenticated alumni or admin access."
-        actions={<Button href="/contact" variant="secondary">Update your information</Button>}
+        eyebrow="Protected Access"
+        title="Keep the network useful while protecting internal data"
+        description="The alumni directory is now restricted to authenticated active members, alumni, and admins. Public visitors are redirected to sign in."
+        actions={
+          <Button href="/contact" variant="secondary">
+            Update your information
+          </Button>
+        }
       />
     </>
   );
