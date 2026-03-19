@@ -24,7 +24,7 @@ export default async function AlumniAdminPage() {
       <div className="grid gap-6 xl:grid-cols-[1.05fr_1fr]">
         <ApiForm
           title="Create alumni profile"
-          description="Add a public-safe alumni directory profile, including the graduation metadata that controls alumni-access eligibility."
+          description="Add a public and safe alumni directory profile, including the graduation metadata that controls alumni-access eligibility."
           endpoint="/api/admin/alumni"
           successMessage="Alumni record submitted successfully."
           submitLabel="Create record"
