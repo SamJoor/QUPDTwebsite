@@ -36,11 +36,15 @@ function escapeHtml(value: string) {
 }
 
 function getSiteUrl() {
-  return (
+  const raw =
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.SITE_URL ||
-    "https://ctepsilonphidelts.org"
-  ).replace(/\/+$/, "");
+    "https://ctepsilonphidelts.org";
+
+  return raw
+    .replace(/\/+$/, "")
+    .replace(/\/newsletter$/, "")
+    .replace(/\/newsletters$/, "");
 }
 
 async function getActiveSubscribers(
@@ -155,6 +159,11 @@ export async function POST(_request: Request, context: RouteContext) {
     const siteUrl = getSiteUrl();
     const issueUrl = `${siteUrl}/newsletter/${newsletter.slug}`;
 
+    console.log("[newsletter send] siteUrl =", siteUrl);
+    console.log("[newsletter send] issueUrl =", issueUrl);
+    console.log("[newsletter send] slug =", newsletter.slug);
+    console.log("[newsletter send] newsletterId =", newsletter.id);
+
     const { subscribers, mode } = await getActiveSubscribers(supabase);
 
     if (!subscribers.length) {
@@ -172,7 +181,6 @@ export async function POST(_request: Request, context: RouteContext) {
     const resendApiKey = process.env.RESEND_API_KEY;
     const resendFromEmail = process.env.RESEND_FROM_EMAIL;
 
-    // Keep your old preview-mode behavior if env vars are not set.
     if (!resendApiKey || !resendFromEmail) {
       return NextResponse.json({
         success: true,
@@ -188,7 +196,9 @@ export async function POST(_request: Request, context: RouteContext) {
     const resend = new Resend(resendApiKey);
 
     const subject =
-      newsletter.subject_line?.trim() || newsletter.title || "Phi Delta Theta Newsletter";
+      newsletter.subject_line?.trim() ||
+      newsletter.title ||
+      "Phi Delta Theta Newsletter";
 
     const summary = newsletter.summary?.trim() || "";
     const bodyContent = newsletter.body_content?.trim() || "";
