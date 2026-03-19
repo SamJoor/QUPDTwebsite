@@ -19,10 +19,10 @@ export const navItems: NavItem[] = [
 ];
 
 export const chapterStats: Stat[] = [
-  { value: '450+', label: 'Connected Alumni', description: 'A growing network of brothers, supporters, and chapter friends.' },
-  { value: '35+', label: 'Mentors & Volunteers', description: 'Alumni already positioned to help with guidance and opportunity.' },
-  { value: '8', label: 'Annual Signature Events', description: 'Recurring touchpoints designed to keep the chapter active year-round.' },
-  { value: '60+', label: 'Years of Chapter History', description: 'A legacy worth preserving in a more permanent digital home.' }
+  { value: 'SOON', label: 'Connected Alumni', description: 'A growing network of brothers, supporters, and chapter friends.' },
+  { value: 'SOON', label: 'Mentors & Volunteers', description: 'Alumni already positioned to help with guidance and opportunity.' },
+  { value: '~2', label: 'Annual Signature Events', description: 'Recurring touchpoints designed to keep the chapter active year-round.' },
+  { value: '.5', label: 'Years of Chapter History', description: 'A legacy worth preserving in a more permanent digital home.' }
 ];
 
 export const values = [
