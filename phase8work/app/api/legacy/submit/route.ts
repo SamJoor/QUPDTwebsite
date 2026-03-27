@@ -34,7 +34,6 @@ export async function POST(request: Request) {
     const firstName = getString("firstName");
     const lastName = getString("lastName");
     const graduationYear = getNumber("graduationYear");
-    const bondNumber = getString("bondNumber");
     const title = getString("title");
     const memoryBody = getString("memoryBody");
     const mediaType = getString("mediaType") || "memory";
@@ -44,7 +43,6 @@ export async function POST(request: Request) {
       !firstName ||
       !lastName ||
       !graduationYear ||
-      !bondNumber ||
       !title ||
       !memoryBody ||
       !consentToPublish
@@ -77,7 +75,7 @@ export async function POST(request: Request) {
 
     const { data: privateDetails, error: privateError } = await supabase
       .from("alumni_private_details")
-      .select("alumni_profile_id, email, bond_number")
+      .select("alumni_profile_id, email")
       .eq("alumni_profile_id", profile.id)
       .maybeSingle();
 
@@ -88,13 +86,6 @@ export async function POST(request: Request) {
     if (!privateDetails) {
       return NextResponse.json(
         { error: "Your private record could not be found." },
-        { status: 403 }
-      );
-    }
-
-    if ((privateDetails.bond_number || "").trim() !== bondNumber) {
-      return NextResponse.json(
-        { error: "Bond number did not match our records." },
         { status: 403 }
       );
     }

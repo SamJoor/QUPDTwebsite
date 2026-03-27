@@ -278,13 +278,6 @@ export async function POST(
       );
     }
 
-    if (!sameLoose(privateDetails.email, input.email)) {
-      return NextResponse.json(
-        { error: "Email did not match our records." },
-        { status: 403 }
-      );
-    }
-
     if (!isEligibleMemberStatus(matchedProfile.member_status)) {
       return NextResponse.json(
         { error: "Only eligible active members can apply." },

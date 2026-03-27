@@ -70,14 +70,6 @@ export function LegacySubmissionForm() {
           />
         </div>
 
-        <div>
-          <label className="mb-2 block text-sm font-medium">Bond number</label>
-          <input
-            name="bondNumber"
-            required
-            className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none"
-          />
-        </div>
 
         <div className="md:col-span-2">
           <label className="mb-2 block text-sm font-medium">Title</label>

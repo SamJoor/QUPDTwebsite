@@ -107,7 +107,7 @@ export function MentorshipOpportunityApplicationForm({
         </p>
         <ul className="mt-2 space-y-1">
           <li>
-            • First name, last name, graduation year, bond number, and email
+            • First name, last name, graduation year, and email
             should match fraternity records.
           </li>
           <li>• Introductory message is required.</li>
@@ -163,7 +163,6 @@ export function MentorshipOpportunityApplicationForm({
           <input
             id="bondNumber"
             name="bondNumber"
-            required
             maxLength={50}
             defaultValue={defaults?.bondNumber || ""}
             className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-fraternity-burgundy"

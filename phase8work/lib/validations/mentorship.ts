@@ -36,7 +36,7 @@ export const mentorshipOpportunitySchema = z.object({
 export const mentorshipOpportunityApplicationSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
   lastName: z.string().trim().min(1).max(80),
-  bondNumber: z.string().trim().min(1).max(50),
+  bondNumber: z.string().trim().max(50).optional().or(z.literal("")),
   email: z.string().trim().email().max(160),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
   graduationYear: z.coerce.number().int().min(2000).max(currentYear + 10),
