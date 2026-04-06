@@ -24,6 +24,7 @@ export async function POST(request: Request) {
 
   // Verify Turnstile token if the secret key is configured
   const token = typeof json['cf-turnstile-response'] === 'string' ? json['cf-turnstile-response'] : '';
+  console.log('[turnstile] token present:', !!token, '| token length:', token.length);
   if (process.env.TURNSTILE_SECRET_KEY) {
     const ip = request.headers.get('CF-Connecting-IP') ?? request.headers.get('x-forwarded-for');
     const valid = await verifyTurnstile(token, ip);
