@@ -18,7 +18,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Supabase is not connected. Add your keys before using Storage uploads.' }, { status: 400 });
   }
 
-  const formData = await request.formData();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formData = await request.formData() as any;
   const bucket = String(formData.get('bucket') || '').trim();
   const folder = String(formData.get('folder') || '').trim();
   const file = formData.get('file');
