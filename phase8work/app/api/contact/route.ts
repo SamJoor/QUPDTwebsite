@@ -14,8 +14,7 @@ async function verifyTurnstile(token: string, ip: string | null): Promise<boolea
     method: 'POST',
     body,
   });
-  const data = (await res.json()) as { success: boolean; 'error-codes'?: string[] };
-  console.log('[turnstile] verify result:', JSON.stringify(data));
+  const data = (await res.json()) as { success: boolean };
   return data.success === true;
 }
 
@@ -24,7 +23,6 @@ export async function POST(request: Request) {
 
   // Verify Turnstile token if the secret key is configured
   const token = typeof json['cf-turnstile-response'] === 'string' ? json['cf-turnstile-response'] : '';
-  console.log('[turnstile] token present:', !!token, '| token length:', token.length);
   if (process.env.TURNSTILE_SECRET_KEY) {
     const ip = request.headers.get('CF-Connecting-IP') ?? request.headers.get('x-forwarded-for');
     const valid = await verifyTurnstile(token, ip);

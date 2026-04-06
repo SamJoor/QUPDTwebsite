@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { adminLoginSchema } from "@/lib/validations/admin";
 import { createSessionToken } from "@/lib/auth/session";
@@ -7,6 +8,13 @@ import {
   createSupabaseAnonServerClient,
   hasSupabaseAuthEnv,
 } from "@/lib/supabase/auth";
+import { checkRateLimit, clearRateLimit } from "@/lib/auth/rate-limit";
+
+function timingSafePasswordMatch(input: string, expected: string): boolean {
+  const a = crypto.createHash('sha256').update(input).digest();
+  const b = crypto.createHash('sha256').update(expected).digest();
+  return crypto.timingSafeEqual(a, b);
+}
 
 type LoginScope = "admin" | "alumni" | "active";
 
@@ -151,6 +159,11 @@ async function verifyScopedCredentials(
 }
 
 export async function POST(request: Request) {
+  const ip = request.headers.get('CF-Connecting-IP') ?? request.headers.get('x-forwarded-for') ?? 'unknown';
+  if (!checkRateLimit(`login:${ip}`, 5, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Too many login attempts. Please wait 10 minutes.' }, { status: 429 });
+  }
+
   const json = await request.json().catch(() => null);
   const parsed = adminLoginSchema.safeParse(json);
 
@@ -177,7 +190,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (password !== expectedPassword) {
+    if (!timingSafePasswordMatch(password, expectedPassword)) {
       return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
     }
   } else {
@@ -202,6 +215,7 @@ export async function POST(request: Request) {
     );
   }
 
+  clearRateLimit(`login:${ip}`);
   const response = NextResponse.json({ ok: true });
 
   response.cookies.set({

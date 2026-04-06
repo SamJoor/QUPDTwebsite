@@ -53,7 +53,18 @@ function isEligibleMemberStatus(status?: string | null) {
   ].includes(normalized);
 }
 
-function validateUpload(file: File | null, label: string, required = false) {
+async function hasValidFileSignature(file: File): Promise<boolean> {
+  const bytes = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+  // PDF: %PDF
+  if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) return true;
+  // ZIP-based (DOCX): PK
+  if (bytes[0] === 0x50 && bytes[1] === 0x4B) return true;
+  // OLE2 compound doc (DOC): D0 CF 11 E0
+  if (bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0) return true;
+  return false;
+}
+
+async function validateUpload(file: File | null, label: string, required = false) {
   if (!file || file.size === 0) {
     if (required) {
       return `${label} is required.`;
@@ -67,6 +78,10 @@ function validateUpload(file: File | null, label: string, required = false) {
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
     return `${label} must be 5 MB or smaller.`;
+  }
+
+  if (!(await hasValidFileSignature(file))) {
+    return `${label} does not appear to be a valid PDF, DOC, or DOCX file.`;
   }
 
   return null;

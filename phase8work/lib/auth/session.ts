@@ -17,7 +17,9 @@ function encode(payload: SessionUser) {
 }
 
 function decode(token: string): SessionUser | null {
-  const [body, signature] = token.split('.');
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [body, signature] = parts;
   if (!body || !signature) return null;
 
   const expected = crypto.createHmac('sha256', getSessionSecret()).update(body).digest('base64url');
