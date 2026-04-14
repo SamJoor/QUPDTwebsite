@@ -230,50 +230,50 @@ export const newsletters: NewsletterIssue[] = [
 ];
 
 export const alumniSpotlight: Spotlight = {
-  name: 'Christopher Lane',
-  role: 'Class of 2010 · Founder, Lane Advisory Group',
-  quote: 'Phi Delta Theta shaped how I lead, how I serve, and how I stay connected to something bigger than myself.',
+  name: 'Ben Berube',
+  role: 'OG Pres',
+  quote: 'https://www.pinterest.com/pin/original-image--813251645231601330/',
   story:
-    'Christopher remains deeply involved with the chapter by mentoring graduating seniors, supporting leadership development, and helping build long-term alumni infrastructure.'
+    'We will miss you Ben'
 };
 
 export const timeline: TimelineEntry[] = [
   {
-    year: '1961',
+    year: '2025',
     title: 'Chapter Founded',
-    description: 'A new generation of Phi Delta Theta brothers established the chapter with a focus on scholarship, leadership, and enduring brotherhood.'
+    description: ''
   },
   {
-    year: '1988',
-    title: 'First Major Alumni Weekend',
-    description: 'Alumni leadership formalized an annual tradition of reunion, recognition, and chapter support.'
+    year: '3025',
+    title: 'First Alumni Event',
+    description: 'Promised to us 1000 years ago'
   },
   {
-    year: '2005',
-    title: 'Scholarship & Service Expansion',
-    description: 'The chapter entered a new era of visibility through academic achievement and broader philanthropic impact.'
+    year: '4000',
+    title: 'idk',
+    description: ''
   },
   {
-    year: '2026',
-    title: 'Digital Alumni Network Launch',
-    description: 'The chapter began building a modern digital hub to preserve history and strengthen alumni engagement for the long term.'
+    year: '5000',
+    title: 'etc. etc. we get the point atp',
+    description: ' '
   }
 ];
 
 export const legacyVaultItems: LegacyVaultItem[] = [
   {
     id: '1',
-    title: 'Founders Day Composite Board',
-    era: '1970s',
+    title: 'Composite Board',
+    era: '300BC',
     type: 'Composite',
-    description: 'A preserved composite from a defining decade in chapter identity and campus visibility.'
+    description: ''
   },
   {
     id: '2',
-    title: 'Letter from Alumni Board President',
-    era: '1990s',
+    title: 'Letter from President',
+    era: '2025',
     type: 'Document',
-    description: 'A written reflection on chapter continuity, service, and the responsibility of alumni stewardship.'
+    description: 'https://www.pinterest.com/pin/original-image--813251645231601330/'
   },
   {
     id: '3',
@@ -295,10 +295,10 @@ export const legacyVaultItems: LegacyVaultItem[] = [
 export const defaultHomePageContent: HomePageContent = {
   heroEyebrow: 'Phi Delta Theta Alumni Network',
   heroTitle: 'Brotherhood That Endures Beyond Graduation',
-  heroDescription: 'A refined digital home built to honor chapter legacy, strengthen alumni connection, and create meaningful opportunities for mentorship, events, and lifelong engagement.',
+  heroDescription: 'A digital home built to strengthen alumni connection, and create meaningful opportunities for mentorship, events, and lifelong engagement.',
   missionEyebrow: 'Our Purpose',
   missionTitle: 'A modern home for lifelong brotherhood',
-  missionDescription: 'This website is designed to help alumni stay connected, preserve chapter history, support active brothers, and create a stronger long-term network across generations.',
+  missionDescription: 'When brothers graduate, they don’t stop being part of the chapter. This site is designed to keep every brother connected, informed, and involved for years to come.',
   valuesEyebrow: 'Values',
   valuesTitle: 'The principles that should shape every section of the site',
   valuesDescription: 'The visual style may feel modern, but the site should still communicate fraternity tradition, chapter pride, and service-minded leadership.',
@@ -324,15 +324,15 @@ export const defaultHomePageContent: HomePageContent = {
 
 export const defaultAboutPageContent: AboutPageContent = {
   heroEyebrow: 'About the Chapter',
-  heroTitle: 'A chapter story built on tradition, service, and enduring connection',
-  heroDescription: 'This page is structured to feel like a premium chapter history page rather than a wall of text, using narrative sections, milestones, and thematic content blocks.',
+  heroTitle: 'A chapter built on tradition, service, and connection',
+  heroDescription: 'This pages function is to tell a bit about our chapter. Im lazy and dont feel like writing it right now',
   overviewTitle: 'Chapter overview',
-  overviewDescription: 'Phi Delta Theta has long served as a place where friendship, leadership, scholarship, and service extend beyond campus and into lifelong brotherhood.',
-  overviewBody: 'This starter gives you a polished framework for telling the real story of your chapter: where it began, how it grew, what traditions define it, and why alumni remain connected years after graduation.',
-  overviewBodySecondary: 'Once you replace the sample copy with chapter-specific history, this page can become one of the strongest emotional trust-builders on the site.',
+  overviewDescription: '',
+  overviewBody: '',
+  overviewBodySecondary: ' ',
   themesTitle: 'Core themes to emphasize',
   themeOneTitle: 'Founding identity',
-  themeOneDescription: 'Why the chapter was established and what values shaped its earliest era.',
+  themeOneDescription: '',
   themeTwoTitle: 'Traditions',
   themeTwoDescription: 'Rituals, annual moments, and shared experiences that brothers still remember.',
   themeThreeTitle: 'Legacy',
