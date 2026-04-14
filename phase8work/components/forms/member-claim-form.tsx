@@ -5,7 +5,31 @@ import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-export function MemberClaimForm() {
+type MemberClaimFormProps = {
+  audience?: 'alumni' | 'active';
+  apiEndpoint?: string;
+  title?: string;
+  description?: string;
+  emailLabel?: string;
+  emailPlaceholder?: string;
+  backHref?: string;
+  backLabel?: string;
+  successMessage?: string;
+  submitLabel?: string;
+};
+
+export function MemberClaimForm({
+  audience = 'alumni',
+  apiEndpoint = '/api/member/claim',
+  title = 'Claim your alumni profile',
+  description = 'Use the email already associated with your alumni record. This creates your alumni account and links it to the chapter directory record so you can manage your own profile.',
+  emailLabel = 'Email used in alumni records',
+  emailPlaceholder = 'name@example.org',
+  backHref = '/member/login',
+  backLabel = 'Back to login',
+  successMessage = 'Profile claimed. You can sign in now.',
+  submitLabel = 'Claim profile'
+}: MemberClaimFormProps) {
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
@@ -25,7 +49,7 @@ export function MemberClaimForm() {
     };
 
     try {
-      const response = await fetch('/api/member/claim', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -40,7 +64,7 @@ export function MemberClaimForm() {
       }
 
       setState('success');
-      setMessage(data.message || 'Profile claimed. You can sign in now.');
+      setMessage(data.message || successMessage);
       form.reset();
     } catch (error) {
       setState('error');
@@ -52,12 +76,10 @@ export function MemberClaimForm() {
     <div className="surface mx-auto max-w-2xl p-8 md:p-10">
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-fraternity-burgundy/80">
-          Phase 7
+          {audience === 'active' ? 'Active access' : 'Phase 7'}
         </p>
-        <h1 className="mt-3 text-4xl">Claim your alumni profile</h1>
-        <p className="mt-4 text-fraternity-slate">
-          Use the email already associated with your alumni record. This creates your alumni account and links it to the chapter directory record so you can manage your own profile.
-        </p>
+        <h1 className="mt-3 text-4xl">{title}</h1>
+        <p className="mt-4 text-fraternity-slate">{description}</p>
       </div>
 
       <form className="space-y-5" onSubmit={handleSubmit}>
@@ -69,13 +91,13 @@ export function MemberClaimForm() {
           <Input name="graduationYear" type="number" placeholder="2014" required />
         </Field>
 
-        <Field label="Email used in alumni records">
-          <Input name="email" type="email" placeholder="name@example.org" required />
+        <Field label={emailLabel}>
+          <Input name="email" type="email" placeholder={emailPlaceholder} required />
         </Field>
 
         <Field
           label="Create a password"
-          hint="Phase 7 uses Supabase email/password auth for member accounts."
+          hint="This uses Supabase email/password auth for member accounts."
         >
           <Input
             name="password"
@@ -88,10 +110,10 @@ export function MemberClaimForm() {
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
           <Button className="min-w-40">
-            {state === 'submitting' ? 'Claiming…' : 'Claim profile'}
+            {state === 'submitting' ? 'Claiming...' : submitLabel}
           </Button>
-          <Button href="/member/login" type="button" variant="secondary">
-            Back to login
+          <Button href={backHref} type="button" variant="secondary">
+            {backLabel}
           </Button>
         </div>
 
