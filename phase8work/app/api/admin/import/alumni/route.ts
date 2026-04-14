@@ -10,6 +10,33 @@ function normalizeCell(value: string | undefined, fallback = "") {
   return (value || fallback).trim();
 }
 
+function getTermEndMonth(term: string) {
+  switch (term) {
+    case "spring":
+      return 4;
+    case "summer":
+      return 7;
+    case "fall":
+      return 12;
+    case "winter":
+      return 1;
+    default:
+      return 4;
+  }
+}
+
+function deriveMemberStatus(graduationYearValue: string | undefined, graduationTermValue: string | undefined) {
+  const graduationYear = Number(graduationYearValue || 0);
+  const graduationTerm = normalizeCell(graduationTermValue, "spring").toLowerCase();
+
+  if (!graduationYear) {
+    return "alumni";
+  }
+
+  const cutoff = new Date(graduationYear, getTermEndMonth(graduationTerm), 1);
+  return Date.now() < cutoff.getTime() ? "active" : "alumni";
+}
+
 export async function POST(request: Request) {
   const session = await requireSession("admin");
   if (!session) {
@@ -54,23 +81,21 @@ export async function POST(request: Request) {
   const normalized = [];
 
   for (const record of records) {
+    const graduationYear = record.graduation_year || record.graduationYear;
+    const graduationTerm = record.graduation_term || record.graduationTerm;
+    const derivedMemberStatus = deriveMemberStatus(graduationYear, graduationTerm);
+
     const parsed = adminAlumniSchema.safeParse({
       fullName: record.full_name || record.fullName,
-      graduationYear: record.graduation_year || record.graduationYear,
+      graduationYear,
       graduationTerm: normalizeCell(
-        record.graduation_term ||
-        record.graduationTerm,
+        graduationTerm,
         "spring"
       ).toLowerCase(),
-      memberStatus: normalizeCell(
-        record.member_status ||
-        record.memberStatus ||
-        record["Member status"],
-        "alumni"
-      ).toLowerCase(),
+      memberStatus: derivedMemberStatus,
       alumniAccessEnabled: parseBoolean(
         record.alumni_access_enabled || record.alumniAccessEnabled,
-        true
+        derivedMemberStatus === "alumni"
       ),
       major: normalizeCell(record.major),
       company: record.company || "Chapter Network",
