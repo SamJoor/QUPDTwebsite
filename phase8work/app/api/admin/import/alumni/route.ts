@@ -6,6 +6,10 @@ import { parseBoolean, parseCsv } from "@/lib/utils/csv";
 
 export const runtime = "nodejs";
 
+function normalizeCell(value: string | undefined, fallback = "") {
+  return (value || fallback).trim();
+}
+
 export async function POST(request: Request) {
   const session = await requireSession("admin");
   if (!session) {
@@ -53,21 +57,22 @@ export async function POST(request: Request) {
     const parsed = adminAlumniSchema.safeParse({
       fullName: record.full_name || record.fullName,
       graduationYear: record.graduation_year || record.graduationYear,
-      graduationTerm: (
+      graduationTerm: normalizeCell(
         record.graduation_term ||
-        record.graduationTerm ||
+        record.graduationTerm,
         "spring"
       ).toLowerCase(),
-      memberStatus: (
+      memberStatus: normalizeCell(
         record.member_status ||
         record.memberStatus ||
+        record["Member status"],
         "alumni"
       ).toLowerCase(),
       alumniAccessEnabled: parseBoolean(
         record.alumni_access_enabled || record.alumniAccessEnabled,
         true
       ),
-      major: record.major,
+      major: normalizeCell(record.major),
       company: record.company || "Chapter Network",
       jobTitle: record.job_title || record.jobTitle || "Brother",
       industry: record.industry || "General",
