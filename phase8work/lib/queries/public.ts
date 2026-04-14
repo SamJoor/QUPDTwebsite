@@ -6,6 +6,8 @@ import { legacyVaultItems as fallbackLegacy } from '@/lib/constants/site';
 type DbAlumniRow = {
   full_name: string;
   graduation_year: number | null;
+  member_status: string | null;
+  alumni_access_enabled: boolean | null;
   company: string | null;
   job_title: string | null;
   industry: string | null;
@@ -124,7 +126,7 @@ function mapLegacyRow(row: DbLegacyRow): LegacyVaultItem {
 async function getDemoPublicData() {
   const store = await readDemoStore();
   return {
-    alumni: store.alumni.filter((row) => row.isPublic).map((row) => ({
+    alumni: store.alumni.filter((row) => row.isPublic && row.memberStatus === 'alumni' && row.alumniAccessEnabled).map((row) => ({
       name: row.fullName,
       gradYear: String(row.graduationYear),
       company: row.company,
@@ -166,8 +168,10 @@ export async function getAlumniProfiles(): Promise<AlumniProfile[]> {
 
   const { data, error } = await supabase
     .from('alumni_profiles')
-    .select('full_name, graduation_year, company, job_title, industry, location, short_bio, linkedin_url, willing_to_mentor, major, is_featured')
+    .select('full_name, graduation_year, member_status, alumni_access_enabled, company, job_title, industry, location, short_bio, linkedin_url, willing_to_mentor, major, is_featured')
     .eq('is_public', true)
+    .eq('member_status', 'alumni')
+    .eq('alumni_access_enabled', true)
     .order('graduation_year', { ascending: false })
     .order('full_name', { ascending: true });
 
