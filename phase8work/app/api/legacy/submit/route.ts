@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { getGraduationDate, getReleaseDate, type GraduationTerm } from "@/lib/legacy";
+import { getGraduationDate, parseReleaseDateInput, type GraduationTerm } from "@/lib/legacy";
 
 export const runtime = "nodejs";
 
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     const title = getString("title");
     const memoryBody = getString("memoryBody");
     const mediaType = getString("mediaType") || "memory";
+    const requestedReleaseDate = getString("releaseDate");
     const consentToPublish = getString("consentToPublish") === "true";
 
     if (
@@ -45,10 +46,36 @@ export async function POST(request: Request) {
       !graduationYear ||
       !title ||
       !memoryBody ||
+      !requestedReleaseDate ||
       !consentToPublish
     ) {
       return NextResponse.json(
         { error: "Please complete all required fields." },
+        { status: 400 }
+      );
+    }
+
+    const releaseAt = parseReleaseDateInput(requestedReleaseDate);
+    if (!releaseAt) {
+      return NextResponse.json(
+        { error: "Please choose a valid release date." },
+        { status: 400 }
+      );
+    }
+
+    const today = new Date();
+    const startOfTodayUtc = Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate(),
+      0,
+      0,
+      0
+    );
+
+    if (releaseAt.getTime() < startOfTodayUtc) {
+      return NextResponse.json(
+        { error: "Release date must be today or later." },
         { status: 400 }
       );
     }
@@ -90,6 +117,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!privateDetails.email) {
+      return NextResponse.json(
+        { error: "We could not find an email on file for this record. Please ask an officer to update your member email first." },
+        { status: 400 }
+      );
+    }
+
     const allowedStatuses = ["active", "graduating", "alumni"];
     const hasAllowedStatus = allowedStatuses.includes(profile.member_status);
 
@@ -111,7 +145,6 @@ export async function POST(request: Request) {
     }
 
     const graduationDate = getGraduationDate(resolvedGraduationYear, graduationTerm);
-    const releaseAt = getReleaseDate(resolvedGraduationYear, graduationTerm);
 
     const fileValue = formData.get("file");
     const file =

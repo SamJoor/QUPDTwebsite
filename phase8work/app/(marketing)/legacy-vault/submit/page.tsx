@@ -18,8 +18,7 @@ export default async function LegacyVaultSubmitPage() {
           </p>
           <h1 className="mt-4 text-4xl">Share a memory for the chapter archive</h1>
           <p className="mt-4 max-w-2xl text-fraternity-slate">
-            This submission form is limited to verified active members. Approved
-            memories are scheduled for release ten years after graduation.
+            This submission form is limited to verified active members. Approved memories are reviewed by the chapter and then released on the date you choose, with the memory sent to your email on file.
           </p>
 
           <div className="mt-10">

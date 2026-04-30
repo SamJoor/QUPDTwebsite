@@ -7,6 +7,7 @@ type State = "idle" | "submitting" | "success" | "error";
 export function LegacySubmissionForm() {
   const [state, setState] = useState<State>("idle");
   const [message, setMessage] = useState("");
+  const today = new Date().toISOString().slice(0, 10);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -93,6 +94,20 @@ export function LegacySubmissionForm() {
         </div>
 
         <div>
+          <label className="mb-2 block text-sm font-medium">Release date</label>
+          <input
+            type="date"
+            name="releaseDate"
+            required
+            min={today}
+            className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none"
+          />
+          <p className="mt-2 text-sm text-fraternity-slate">
+            Choose when this memory should be released back to you by email after admin approval.
+          </p>
+        </div>
+
+        <div>
           <label className="mb-2 block text-sm font-medium">Submission type</label>
           <select
             name="mediaType"
@@ -121,7 +136,7 @@ export function LegacySubmissionForm() {
         <input type="checkbox" name="consentToPublish" value="true" required className="mt-1" />
         <span className="text-sm text-fraternity-slate">
           I confirm that I am submitting this memory voluntarily and give permission for the chapter to review,
-          store, and publish it according to the Legacy Vault process.
+          store, and release it according to the Legacy Vault process.
         </span>
       </label>
 

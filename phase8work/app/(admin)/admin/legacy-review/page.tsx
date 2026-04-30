@@ -69,8 +69,9 @@ export default async function AdminLegacyReviewPage() {
           </p>
           <h1 className="mt-4 text-4xl">Legacy review queue</h1>
           <p className="mt-4 max-w-3xl text-fraternity-slate">
-            Review submitted memories and artifacts. Approved submissions are
-            scheduled for release ten years after the submitter’s graduation date.
+            Review submitted memories and artifacts. Approved submissions stay queued until the
+            submitter&apos;s chosen release date, then the memory is emailed back to them
+            automatically.
           </p>
         </div>
 
@@ -89,7 +90,7 @@ export default async function AdminLegacyReviewPage() {
                       <strong>{item.status}</strong>
                     </p>
                     <p className="text-sm text-fraternity-slate">
-                      Release date: {new Date(item.release_at).toLocaleDateString()}
+                      Requested release date: {new Date(item.release_at).toLocaleDateString()}
                     </p>
 
                     {item.previewUrl ? (
@@ -155,8 +156,8 @@ export default async function AdminLegacyReviewPage() {
                       />
                     ) : (
                       <div className="rounded-2xl bg-fraternity-cream p-4 text-sm text-fraternity-slate">
-                        This attachment type does not support inline preview.
-                        Use the “Open attachment” link above.
+                        This attachment type does not support inline preview. Use the "Open
+                        attachment" link above.
                       </div>
                     )}
                   </div>

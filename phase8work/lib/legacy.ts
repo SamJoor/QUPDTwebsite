@@ -25,3 +25,20 @@ export function getReleaseDate(year: number, term: GraduationTerm): Date {
     )
   );
 }
+
+export function parseReleaseDateInput(input: string): Date | null {
+  const trimmed = input.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null;
+
+  const [yearString, monthString, dayString] = trimmed.split("-");
+  const year = Number(yearString);
+  const month = Number(monthString);
+  const day = Number(dayString);
+
+  if (!year || !month || !day) return null;
+
+  const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date;
+}
