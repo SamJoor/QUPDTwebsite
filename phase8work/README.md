@@ -39,3 +39,32 @@ SESSION_SECRET=
 - Admin login still uses the local env password for now.
 - Member login uses Supabase Auth when your project keys are present.
 - Member route protection still uses the app's signed cookie session after successful authentication.
+
+## Google Form / spreadsheet automation
+If you want new form responses to go directly into Supabase without a manual CSV upload, use the webhook at:
+
+`POST /api/integrations/alumni-import`
+
+Authenticate with either:
+
+- `Authorization: Bearer $FORM_IMPORT_SECRET`
+- or `x-import-secret: $FORM_IMPORT_SECRET`
+
+The route accepts either a single row object, `{ row: {...} }`, or `{ records: [{...}] }`.
+
+Example payload:
+
+```json
+{
+  "row": {
+    "full_name": "Samuel Joor",
+    "email": "samuel.joor@quinnipiac.edu",
+    "phone": "9789124177",
+    "major": "Data Science",
+    "graduation_year": "2026",
+    "graduation_term": "Spring"
+  }
+}
+```
+
+This is designed to work well with Google Apps Script, Zapier, Make, or Power Automate after a Google Form / spreadsheet submission.
